@@ -1,0 +1,33 @@
+import pandas as pd
+import csv
+import re
+import requests
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+
+feedback = []
+#iterating over different url of same product by editing url using for loop
+number = [*range(1,85,1)]
+for i in number:
+    URL='https://www.amazon.in/Samsung-Galaxy-Midnight-128GB-Storage/product-reviews/B07HGJKDRR/ref=cm_cr_arp_d_paging_btm_next_'+str(i)+'?ie=UTF8&reviewerType=all_reviews&pageNumber='+str(i)
+    r = requests.get(URL) 
+    soup = BeautifulSoup(r.content, 'html.parser')
+    
+    # parsing required text from webpage and saving in a list
+    a=soup.findAll('div',attrs={"class":"a-row a-spacing-small review-data"})
+    
+    # cleaning and saving feedback
+    for b in a:
+        feedback.append(b.text)
+
+#Cleaning line break from list using Lambda function
+feedback=list(map(lambda x: x.replace('\n',''),feedback))
+print(feedback)		
+
+#making a dictionary from a list of feedback and changing into dataframe
+dict1 = {'Feedbacks':feedback}  
+data=pd.DataFrame(dict1)
+print(data)
+
+# saving a dataframe into csv file
+export_data_csv = data.to_csv (r'C:\Users\satish rawat\data.csv', index = None, header=True)
